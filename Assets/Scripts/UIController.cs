@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public static class UIController
 {
-    public static void updateText(GameObject textObject, string newText)
+    public static void updateText(TextMeshPro textObject, string newText)
     {
         textObject.text = newText;
     }
