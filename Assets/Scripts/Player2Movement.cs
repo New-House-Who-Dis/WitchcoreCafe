@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Player2Movement : MonoBehaviour
 {
+    public Animator animator;
+
     public float moveSpeed = 5f;
 
     public Rigidbody2D rb;
@@ -15,6 +17,29 @@ public class Player2Movement : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal2");
         movement.y = Input.GetAxisRaw("Vertical2");
+
+        if (movement.x == 0)
+        {
+            if (movement.y == -1)
+            {
+                movement.x = 1;
+            }
+            else if (movement.y == 1)
+            {
+                movement.x = -1;
+            }
+        }
+        if (movement.y == 0)
+        {
+            if (movement.x == 1)
+            {
+                movement.y = 1;
+            }
+            else if (movement.x == -1)
+            {
+                movement.y = -1;
+            }
+        }
         Debug.Log("WHEEE");
         Debug.Log(movement);
     }
