@@ -4,48 +4,75 @@ using UnityEngine;
 
 public class Player2Movement : MonoBehaviour
 {
-    public Animator animator;
+    private Animator _animator;
+    private SpriteRenderer _spriteRenderer;
 
     public float moveSpeed = 5f;
 
     public Rigidbody2D rb;
 
     Vector2 movement;
+    void Start()
+    {
+        _animator = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     // Update is called once per frame
     void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal2");
         movement.y = Input.GetAxisRaw("Vertical2");
-
-        if (movement.x == 0)
+        if (movement.x == 0 && movement.y == 0) //not moving
         {
-            if (movement.y == -1)
+            _animator.SetBool("walking", false);
+        }
+        else
+        {
+            _animator.SetBool("walking", true);
+            if (movement.x == 0)
             {
-                movement.x = 1;
+                if (movement.y == -1) //DOWN: facing down and right
+                {
+                    movement.x = 1;
+                    _spriteRenderer.flipX = false;
+                }
+                else if (movement.y == 1)
+                { //UP: facing up and left
+                    movement.x = -1;
+                    _spriteRenderer.flipX = false;
+                }
             }
-            else if (movement.y == 1)
+            if (movement.y == 0)
             {
-                movement.x = -1;
+                if (movement.x == 1) //RIGHT: facing right and up, FLIP
+                {
+                    movement.y = 1;
+                    _spriteRenderer.flipX = true;
+                }
+                else if (movement.x == -1) //LEFT: facing left and down, FLIP
+                {
+                    movement.y = -1;
+                    _spriteRenderer.flipX = true;
+                }
             }
         }
-        if (movement.y == 0)
-        {
-            if (movement.x == 1)
-            {
-                movement.y = 1;
-            }
-            else if (movement.x == -1)
-            {
-                movement.y = -1;
-            }
-        }
-        Debug.Log("WHEEE");
-        Debug.Log(movement);
+        updateDirection(movement.y);
     }
 
     void FixedUpdate()
     {
         rb.MovePosition(rb.position + moveSpeed * movement * Time.deltaTime);
+    }
+    void updateDirection(float y)
+    {
+        if (y == -1)
+        {
+            _animator.SetBool("facingDown", true);
+        }
+        else if (y == 1)
+        {
+            _animator.SetBool("facingDown", false);
+        }
     }
 }

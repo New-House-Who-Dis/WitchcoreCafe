@@ -60,7 +60,7 @@ public class Player1Movement : MonoBehaviour
             }
         }
         updateDirection(movement.y);
-        Debug.Log(movement);
+        // Debug.Log(movement);
     }
 
     void FixedUpdate()
