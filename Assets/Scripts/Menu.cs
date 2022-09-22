@@ -37,4 +37,9 @@ public class Menu : MonoBehaviour
     {
         UIController.switchScene(newSceneName);
     }
+
+    public void exit()
+    {
+        Application.Quit();
+    }
 }
