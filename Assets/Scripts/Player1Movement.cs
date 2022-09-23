@@ -25,13 +25,22 @@ public class Player1Movement : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal1");
         movement.y = Input.GetAxisRaw("Vertical1");
+
         if (movement.x == 0 && movement.y == 0) //not moving
         {
             _animator.SetBool("walking", false);
+            if (FindObjectOfType<AudioManager>().isPlaying("Footsteps1") == true)
+            {
+                FindObjectOfType<AudioManager>().Pause("Footsteps1");
+            }
         }
         else
         {
             _animator.SetBool("walking", true);
+            if (FindObjectOfType<AudioManager>().isPlaying("Footsteps1") == false)
+            {
+                FindObjectOfType<AudioManager>().Play("Footsteps1");
+            }
             if (movement.x == 0)
             {
                 if (movement.y == -1) //DOWN: facing down and right

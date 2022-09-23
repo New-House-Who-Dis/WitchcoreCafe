@@ -26,10 +26,18 @@ public class Player2Movement : MonoBehaviour
         if (movement.x == 0 && movement.y == 0) //not moving
         {
             _animator.SetBool("walking", false);
+            if (FindObjectOfType<AudioManager>().isPlaying("Footsteps2") == true)
+            {
+                FindObjectOfType<AudioManager>().Pause("Footsteps2");
+            }
         }
         else
         {
             _animator.SetBool("walking", true);
+            if (FindObjectOfType<AudioManager>().isPlaying("Footsteps2") == false)
+            {
+                FindObjectOfType<AudioManager>().Play("Footsteps2");
+            }
             if (movement.x == 0)
             {
                 if (movement.y == -1) //DOWN: facing down and right
