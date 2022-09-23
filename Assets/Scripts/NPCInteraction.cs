@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class NPCInteraction : MonoBehaviour
 {
-    public bool takenOrder;
+    public bool takenOrder = false;
     public bool inRange;
+    public bool orderComplete = false;
+    public Sprite recipeSprite;
+
     public GameObject collidedPlayer;
 
-    public ArrayList order;
+    public List<int> order;
 
     public NPCManager npcManager;
+    public RecipeController rController;
+    public NPCMovement npcMovement;
 
     public int tableNum;
 
@@ -18,6 +23,7 @@ public class NPCInteraction : MonoBehaviour
     void Start()
     {
         takenOrder = false;
+        npcMovement = gameObject.GetComponent<NPCMovement>();
     }
 
     // Update is called once per frame
@@ -29,19 +35,31 @@ public class NPCInteraction : MonoBehaviour
             {
                 if (takenOrder) //if we have already displayed order on queue
                 {
+                    Debug.Log("Step 1");
                     DrinkData playerDrink = collidedPlayer.GetComponent<DrinkData>();
-                    if (DrinkController.compareData(playerDrink, order))
+                    if (DrinkController.compareData(playerDrink, order)) //if Player delivers correct order
                     {
-                        npcManager.updateTableOrderStatus(tableNum);
+                        Debug.Log("Correct order");
+                        Debug.Log("CLEARING");
+                        //updates order status to complete and player no longer has drink
+                        orderComplete = true;
+                        DrinkController.clearData(playerDrink);
+                        rController.removeSprite(recipeSprite);
+                        npcManager.clear(tableNum);
                     }
                     else
                     {
                         //display the angry animation
+                        Debug.Log("Incorrect order");
                     }
                 }
                 else //if we have not displayed order on queue
                 {
                     //display order/recipe to the queue
+                    RecipeData order = rController.createRecipe();
+                    gameObject.GetComponent<NPCInteraction>().setOrder(order.recipeList);
+                    recipeSprite = order.recipeSprite;
+                    takenOrder = true;
                 }
             }
         }
@@ -51,30 +69,27 @@ public class NPCInteraction : MonoBehaviour
     {
         tableNum = tnum;
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    public void setOrder(List<int> newOrder)
     {
-        if (!takenOrder)
-        {
-            if (collision.gameObject.CompareTag("Player"))
-            {
-                inRange = true;
-                collidedPlayer = collision.gameObject;
-        }
+        order = newOrder;
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        this.gameObject.GetComponent<BoxCollider2D>().isTrigger = true;
-        // This will help us detect when the player leaves the range
-        Debug.Log("Something just left the workstation!");
+        Debug.Log("Entered");
         if (collision.gameObject.CompareTag("Player"))
         {
-            inRange = !inRange;
-            Debug.Log("Cat out of " + transform.parent.name + ", meow");
-            if (interactionPrompt.isDisplayed)
-            {
-                interactionPrompt.Close();
-            }
+            Debug.Log("hi player");
+            inRange = true;
+            collidedPlayer = collision.gameObject;
+        }
+    }
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            inRange = false;
         }
     }
 }

@@ -13,6 +13,9 @@ public class NPCMovement : MonoBehaviour
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
 
+    public bool leave = false;
+    public bool sitting = false;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -23,7 +26,13 @@ public class NPCMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        moveToTable();
+        if (leave)
+        {
+            leaveTable();
+        } else if (!leave && !sitting)
+        {
+            moveToTable();
+        }
     }
     public void setPath(Transform[] newPath)
     {
@@ -65,14 +74,18 @@ public class NPCMovement : MonoBehaviour
                 waypointIndex++;
             }
             return false;
+        } else
+        {
+            sitting = true;
+            prevwaypointIndex = path.Length - 1;
+            waypointIndex = path.Length - 1;
         }
         return true;
     }
 
     public bool leaveTable()
     {
-        waypointIndex = path.Length - 1;
-        while (waypointIndex >= 0)
+        if (waypointIndex >= 0)
         {
             //Moving the NPC towards the location
             transform.position = Vector2.MoveTowards(transform.position, path[waypointIndex].transform.position, moveSpeed * Time.deltaTime);
@@ -90,6 +103,11 @@ public class NPCMovement : MonoBehaviour
                 waypointIndex--;
             }
         }
-        return true;
+        else
+        {
+            Destroy(gameObject); //delete self
+            return true;
+        }
+        return false;
     }
 }

@@ -9,23 +9,33 @@ public class NPCManager : MonoBehaviour
     public bool table2Occupied;
     public bool table3Occupied;
 
-    public bool[] table1OrdersComplete;
-    public bool[] table2OrdersComplete;
-    public bool[] table3OrdersComplete;
+    public TableData table1;
+    public TableData table2;
+    public TableData table3;
 
     public NPCGenerator npcGenerator;
 
     public bool[] tables;
+    public TableData[] allTables;
 
     // Start is called before the first frame update
     void Start()
     {
-        clear(1);
-        clear(2);
-        clear(3);
+
         tables = new bool[] { table1Occupied, table2Occupied, table3Occupied };
+        allTables = new TableData[] { table1, table2, table3 };
+        table1Occupied = false;
+        table2Occupied = false;
+        table3Occupied = false;
+        tables[0] = false;
+        tables[1] = false;
+        tables[2] = false;
     }
 
+    void Update()
+    {
+
+    }
     public void BeginGeneration()
     {
         StartCoroutine(FillTables());
@@ -33,27 +43,34 @@ public class NPCManager : MonoBehaviour
 
     IEnumerator FillTables()
     {
-        checkOpenTables();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(Random.Range(3, 7));
+        for (int i = 0; i < tables.Length; i++)
+        {
+            if (!tables[i]) //if table is not occupied
+            {
+                updateTableOccupied(i + 1);
+                int numOfNPCs = Random.Range(1, 3);
+                npcGenerator.generateNPC(numOfNPCs, i + 1); //generate random number between 1 and 2 NPCs to that table
+                yield return new WaitForSeconds(Random.Range(2,4));
+            }
+        }
     }
-    
+
     public void clear(int tableNum)
-    {
+    { 
         if (tableNum == 1)
         {
-            table1OrdersComplete = new bool[] { false, false };
             table1Occupied = false;
         }
         else if (tableNum == 2)
         {
-            table2OrdersComplete = new bool[] { false, false };
             table2Occupied = false;
         }
         else if (tableNum == 3)
         {
-            table3OrdersComplete = new bool[] { false, false };
             table3Occupied = false;
         }
+        tables[tableNum - 1] = false;
     }
 
     public void updateTableOccupied(int tableNum)
@@ -70,14 +87,17 @@ public class NPCManager : MonoBehaviour
         {
             table3Occupied = true;
         }
+        tables[tableNum - 1] = true;
     }
-    public void updateTableOrderStatus(int tableNum)
+    /*
+    public bool updateTableOrderStatus(int tableNum)
     { 
         if (tableNum == 1)
         {
             if (table1OrdersComplete[0] == true)
             {
                 table1OrdersComplete[1] = true;
+                return true;
             } else
             {
                 table1OrdersComplete[0] = true;
@@ -87,6 +107,7 @@ public class NPCManager : MonoBehaviour
             if (table2OrdersComplete[0] == true)
             {
                 table2OrdersComplete[1] = true;
+                return true;
             }
             else
             {
@@ -97,13 +118,16 @@ public class NPCManager : MonoBehaviour
             if (table3OrdersComplete[0] == true)
             {
                 table3OrdersComplete[1] = true;
+                return true;
             }
             else
             {
                 table3OrdersComplete[0] = true;
             }
         }
+        return false;
     }
+    */
 
     public void checkOpenTables()
     {

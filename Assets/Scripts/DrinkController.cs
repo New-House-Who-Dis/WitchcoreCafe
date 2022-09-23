@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public static class DrinkController 
+public static class DrinkController
 {
-
     public static void gotCup(DrinkData drink)
     {
         drink.hasCup = true;
@@ -26,17 +25,28 @@ public static class DrinkController
         drink.atWork = false;
     }
 
-    public static bool compareData(DrinkData drink, ArrayList requiredStations)
+    public static bool compareData(DrinkData drink, List<int> requiredStations)
     {
         drink.workstations.Sort();
         requiredStations.Sort();
-        return drink.workstations == requiredStations;
+        if (drink.workstations.Count != requiredStations.Count)
+        {
+            return false;
+        }
+        for (int i = 0; i < drink.workstations.Count; i++)
+        {
+            if (requiredStations[i] != drink.workstations[i])
+            {
+                return false;
+            }
+        }
+        return true;
     }
-    
+
     public static void clearData(DrinkData drink)
     {
         drink.atWork = false;
         drink.hasCup = false;
-        drink.workstations = new ArrayList();
+        drink.workstations = new List<int>();
     }
 }

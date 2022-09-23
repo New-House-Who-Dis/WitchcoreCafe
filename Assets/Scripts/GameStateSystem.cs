@@ -19,7 +19,8 @@ public class GameStateSystem : MonoBehaviour
     public Button closeDialogue;
     public string dialogue;
 
-    public 
+    public bool regenerate;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,14 +41,13 @@ public class GameStateSystem : MonoBehaviour
 
     IEnumerator TypeDialogue()
     {
-        Debug.Log("started typing");
         dialogueText.text = "";
         dialoguePanel.enabled = true;
         instructionPanel.enabled = true;
         foreach (char c in dialogue)
         {
             dialogueText.text += c;
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.05f);
         }
         yield return new WaitForSeconds(1f);
         closeDialogue.enabled = true;
@@ -56,6 +56,7 @@ public class GameStateSystem : MonoBehaviour
 
     IEnumerator SetupGame()
     {
+        regenerate = false;
         Debug.Log("meow");
         npcManager.BeginGeneration();
         yield return new WaitForSeconds(1f);
@@ -64,6 +65,6 @@ public class GameStateSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

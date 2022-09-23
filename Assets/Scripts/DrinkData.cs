@@ -6,13 +6,13 @@ public class DrinkData : MonoBehaviour
 {
     public bool atWork;
     public bool hasCup;
-    public ArrayList workstations;
+    public List<int> workstations;
 
     // Start is called before the first frame update
     void Start()
     {
         atWork = false;
         hasCup = false;
-        workstations = new ArrayList();
+        workstations = new List<int>();
     }
 }
