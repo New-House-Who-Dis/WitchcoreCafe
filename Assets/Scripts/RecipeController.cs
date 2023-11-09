@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class RecipeController : MonoBehaviour
 {
     public Image[] recipeImages;
-    public Image[] recipeImagesBack;
+    public RecipeData[] recipes; //storing each of the recipedata objects
+
+    public bool showingDefault = true;
 
     public GameObject[] recipePrefabs; //image prefabs with their recipeArray/RecipeData to instantiate
 
@@ -23,13 +25,14 @@ public class RecipeController : MonoBehaviour
         RecipeData data = recipePrefabs[randomIndex].GetComponent<RecipeData>();
 
         //take data and add to our images
-        addImage(data.recipeSprite);
+        Sprite spriteToShow = showingDefault ? data.recipeSprite : data.recipeSpriteBack;
+        addRecipe(data, spriteToShow);
 
         //return list
         return data;
     }
 
-    public void addImage(Sprite recipeSprite)
+    public void addRecipe(RecipeData recipe, Sprite recipeSprite)
     {
         Debug.Log("adding");
         for (int i = 0; i < recipeImages.Length; i++)
@@ -38,6 +41,7 @@ public class RecipeController : MonoBehaviour
             {
                 Debug.Log("null");
                 recipeImages[i].sprite = recipeSprite;
+                recipes[i] = recipe;
                 return;
             }
         }
@@ -49,10 +53,12 @@ public class RecipeController : MonoBehaviour
             if (!Object.ReferenceEquals(recipeImages[i+1].sprite, null)) //if next image is not empty
             {
                 recipeImages[i].sprite = recipeImages[i + 1].sprite; //moving the bottom image to the top image
+                recipes[i] = recipes[i+1];
             }
             else
             {
                 recipeImages[i].sprite = null;
+                recipes[i] = null;
                 return;
             }
             recipeImages[recipeImages.Length - 1].sprite = null;
@@ -71,10 +77,26 @@ public class RecipeController : MonoBehaviour
             if (recipeImages[i].sprite == sprite)
             {
                 recipeImages[i].sprite = null;
+                recipes[i] = null;
                 moveImagesUp(i);
                 return;
             }
         }
         
+    }
+
+    public void flipImages() 
+    { 
+        for (int i = 0; i < recipeImages.Length; i ++)
+        {
+            if (recipeImages[i].sprite == null) //if there is nothing being displayed on the image
+            {
+                showingDefault = !showingDefault;
+                return;
+            }
+            Sprite spriteToShow = showingDefault ? recipes[i].recipeSpriteBack : recipes[i].recipeSprite;
+            recipeImages[i].sprite = spriteToShow;//show the front
+        }
+        showingDefault = !showingDefault;
     }
 }

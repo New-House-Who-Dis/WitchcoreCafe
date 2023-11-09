@@ -58,7 +58,7 @@ public class NPCInteraction : MonoBehaviour
                     //display order/recipe to the queue
                     RecipeData order = rController.createRecipe();
                     gameObject.GetComponent<NPCInteraction>().setOrder(order.recipeList);
-                    recipeSprite = order.recipeSprite;
+                    //recipeSprite = order.recipeSprite;
                     takenOrder = true;
                 }
             }
