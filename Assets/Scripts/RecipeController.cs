@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class RecipeController : MonoBehaviour
 {
     public Image[] recipeImages;
+    public Image[] recipeImagesBack;
 
     public GameObject[] recipePrefabs; //image prefabs with their recipeArray/RecipeData to instantiate
 
