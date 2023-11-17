@@ -11,7 +11,8 @@ public class RecipeController : MonoBehaviour
     public bool showingDefault = true;
 
     public GameObject[] recipePrefabs; //image prefabs with their recipeArray/RecipeData to instantiate
-
+    
+    public bool day = true; //indicates if we should be using day or night recipes
 
     // Update is called once per frame
     void Update()
@@ -21,7 +22,7 @@ public class RecipeController : MonoBehaviour
 
     public RecipeData createRecipe()
     {
-        int randomIndex = Random.Range(0,recipePrefabs.Length);
+        int randomIndex = day ? Random.Range(0,16) : Random.Range(16, recipePrefabs.Length); //changes based on day vs night
         RecipeData data = recipePrefabs[randomIndex].GetComponent<RecipeData>();
 
         //take data and add to our images
