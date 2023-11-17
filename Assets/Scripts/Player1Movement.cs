@@ -46,12 +46,10 @@ public class Player1Movement : MonoBehaviour
                 if (movement.y == -1) //DOWN: facing down and right
                 {
                     movement.x = 1;
-                    _spriteRenderer.flipX = false;
                 }
                 else if (movement.y == 1)
                 { //UP: facing up and left
                     movement.x = -1;
-                    _spriteRenderer.flipX = false;
                 }
             }
             if (movement.y == 0)
@@ -59,14 +57,20 @@ public class Player1Movement : MonoBehaviour
                 if (movement.x == 1) //RIGHT: facing right and up, FLIP
                 {
                     movement.y = 1;
-                    _spriteRenderer.flipX = true;
                 }
                 else if (movement.x == -1) //LEFT: facing left and down, FLIP
                 {
                     movement.y = -1;
-                    _spriteRenderer.flipX = true;
                 }
             }
+
+            if (movement.x != movement.y) //default images are up + left and down + right
+            {
+                _spriteRenderer.flipX = false;
+            } else {
+                _spriteRenderer.flipX = true;
+            }
+            
         }
         updateDirection(movement.y);
         // Debug.Log(movement);
