@@ -67,14 +67,10 @@ public class NPCGenerator : MonoBehaviour
 
             //assigning path and table num
             newNPC.GetComponent<NPCMovement>().setPath(currentTable[randomTableIndex]);
-            newNPC.AddComponent<NPCInteraction>(); //creating NPCInteraction script
+            Debug.Log("hi");
             newNPC.GetComponent<NPCInteraction>().setTableNum(currentTableNum);
             newNPC.GetComponent<NPCInteraction>().npcManager = npcManager;
             newNPC.GetComponent<NPCInteraction>().rController = rController;
-
-            //create the Recipe and display on RecipeController
-            //set the recipeArray in the NPC as well
-            //newNPC.GetComponent<NPCInteraction>().setOrder(rController.createRecipe());
 
             randomTableIndex = 1 - randomTableIndex;
             if (tableNum == 1)

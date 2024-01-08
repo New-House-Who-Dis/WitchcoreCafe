@@ -14,13 +14,14 @@ public class TableData : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        clear();
+        //clear();
     }
 
     public void addNPC(GameObject npc)
     {
         NPCs.Add(npc);
     }
+    
     public void clear()
     {
         StartCoroutine(ClearObjects());
@@ -53,8 +54,8 @@ public class TableData : MonoBehaviour
              {
                 GameObject npc1 = NPCs[0];
                 GameObject npc2 = NPCs[1];
-                NPCs.Remove(NPCs[0]);
                 NPCs.Remove(NPCs[1]);
+                NPCs.Remove(NPCs[0]);
                 yield return new WaitForSeconds(Random.Range(2, 6));
                 //leave table
                 npc1.GetComponent<NPCMovement>().leave = true;

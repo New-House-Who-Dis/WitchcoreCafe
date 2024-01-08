@@ -2,29 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player1Movement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
+    
+    [SerializeField]
+    private string horizontalInputName;
+    [SerializeField]
+    private string verticalInputName;
+
     enum Direction { Left, Right, Up, Down };
-
-    public float moveSpeed = 5f;
-
+    public float moveSpeed = 2.5f;
     public Rigidbody2D rb;
-
     Vector2 movement;
+
+    [SerializeField]
+    private Vector3 drinkRightOffset;
+    [SerializeField]
+    private Vector3 drinkLeftOffset;
+    private GameObject drinkGameObject;
 
     void Start()
     {
         _animator = GetComponent<Animator>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        rb = GetComponent<Rigidbody2D>();
+
+        drinkGameObject = transform.Find("Drink").gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        movement.x = Input.GetAxisRaw("Horizontal1");
-        movement.y = Input.GetAxisRaw("Vertical1");
+        //freezes input when player is "busy" (i.e cooking)
+        movement.x = _animator.GetBool("cooking") ? 0 : Input.GetAxisRaw(horizontalInputName);
+        movement.y = _animator.GetBool("cooking") ? 0: Input.GetAxisRaw(verticalInputName);
+        
 
         if (movement.x == 0 && movement.y == 0) //not moving
         {
@@ -46,10 +61,14 @@ public class Player1Movement : MonoBehaviour
                 if (movement.y == -1) //DOWN: facing down and right
                 {
                     movement.x = 1;
+                    drinkGameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                    drinkGameObject.transform.localPosition = drinkRightOffset;
                 }
                 else if (movement.y == 1)
                 { //UP: facing up and left
                     movement.x = -1;
+                    drinkGameObject.GetComponent<SpriteRenderer>().sortingOrder = -1;
+                    drinkGameObject.transform.localPosition = drinkLeftOffset;
                 }
             }
             if (movement.y == 0)
@@ -57,10 +76,14 @@ public class Player1Movement : MonoBehaviour
                 if (movement.x == 1) //RIGHT: facing right and up, FLIP
                 {
                     movement.y = 1;
+                    drinkGameObject.GetComponent<SpriteRenderer>().sortingOrder = -1;
+                    drinkGameObject.transform.localPosition = drinkRightOffset;
                 }
                 else if (movement.x == -1) //LEFT: facing left and down, FLIP
                 {
                     movement.y = -1;
+                    drinkGameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                    drinkGameObject.transform.localPosition = drinkLeftOffset;
                 }
             }
 
@@ -73,13 +96,13 @@ public class Player1Movement : MonoBehaviour
             
         }
         updateDirection(movement.y);
-        // Debug.Log(movement);
     }
 
     void FixedUpdate()
     {
         rb.MovePosition(rb.position + moveSpeed * movement * Time.deltaTime);
     }
+
     void updateDirection(float y)
     {
         if (y == -1)
@@ -89,5 +112,10 @@ public class Player1Movement : MonoBehaviour
         {
             _animator.SetBool("facingDown", false);
         }
+    }
+
+    public void updateBusy(bool busy)
+    {
+        _animator.SetBool("cooking", busy); //plays or stops cooking animation based on bool
     }
 }

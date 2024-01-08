@@ -71,6 +71,8 @@ public class NPCManager : MonoBehaviour
             table3Occupied = false;
         }
         tables[tableNum - 1] = false;
+        FillTables();
+        //TODO: figure out implementing "waves" so that player is not just stuck in a constant loop of serving customers (unless it is the intended gameplay loop)
     }
 
     public void updateTableOccupied(int tableNum)
@@ -127,7 +129,7 @@ public class NPCManager : MonoBehaviour
         }
         return false;
     }
-    */
+    
 
     public void checkOpenTables()
     {
@@ -140,4 +142,5 @@ public class NPCManager : MonoBehaviour
             }
         }
     }
+    */
 }
