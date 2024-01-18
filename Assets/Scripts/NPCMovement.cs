@@ -12,9 +12,11 @@ public class NPCMovement : MonoBehaviour
 
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
+    public GameObject alertPrefab;
+    private Animator alertAnimator;
 
     public bool leave = false;
-    public bool sitting = false;
+    public bool sitting = false; //TODO: consider removing sitting bools and instead retrieving it from the animator parameter isWalking 
 
     // Start is called before the first frame update
     void Awake()
@@ -34,12 +36,13 @@ public class NPCMovement : MonoBehaviour
             moveToTable();
         }
     }
+
     public void setPath(Transform[] newPath)
-    {
-        
+    { 
         path = newPath;
+        Debug.Log("hi1");
         transform.position = path[waypointIndex].transform.position;
-        Debug.Log(path);
+        Debug.Log("hi2");
     }
     
     public bool movingLeft(Transform currentTransform)
@@ -58,6 +61,7 @@ public class NPCMovement : MonoBehaviour
     {
         if (waypointIndex < path.Length)
         {
+            _animator.SetBool("isWalking", true);
             //Moving the NPC towards the location
             transform.position = Vector2.MoveTowards(transform.position, path[waypointIndex].transform.position, moveSpeed * Time.deltaTime);
             if (movingLeft(transform))
@@ -76,7 +80,14 @@ public class NPCMovement : MonoBehaviour
             return false;
         } else
         {
-            sitting = true;
+            // Instantiate "ready to order" VFX
+            GameObject newAlert = Instantiate(alertPrefab, transform.position + new Vector3(0.5f, 1f, 0f), Quaternion.identity);
+            newAlert.transform.parent = transform;
+            newAlert.name = "Alert";
+            alertAnimator = newAlert.GetComponent<Animator>();
+
+            _animator.SetBool("isWalking", false);
+            sitting = true; 
             prevwaypointIndex = path.Length - 1;
             waypointIndex = path.Length - 1;
         }
@@ -87,6 +98,13 @@ public class NPCMovement : MonoBehaviour
     {
         if (waypointIndex >= 0)
         {
+            if (transform.Find("Alert") != null) {
+                // First time calling leaveTable()
+                Destroy(transform.Find("Alert").gameObject);
+                alertAnimator = null;
+                _animator.SetBool("isWalking", true);
+            }
+
             //Moving the NPC towards the location
             transform.position = Vector2.MoveTowards(transform.position, path[waypointIndex].transform.position, moveSpeed * Time.deltaTime);
             if (movingLeft(transform))

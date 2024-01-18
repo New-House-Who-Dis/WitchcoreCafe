@@ -7,15 +7,16 @@ public class NPCInteraction : MonoBehaviour
     public bool takenOrder = false;
     public bool inRange;
     public bool orderComplete = false;
-    public Sprite recipeSprite;
-
     public GameObject collidedPlayer;
+    public GameObject toolTipPrefab;
+    public TooltipScriptableObject tooltipConstant;
 
-    public List<int> order;
+    public Recipe order;
 
     public NPCManager npcManager;
     public RecipeController rController;
     public NPCMovement npcMovement;
+    public HUDController hudController;
 
     public int tableNum;
 
@@ -24,45 +25,8 @@ public class NPCInteraction : MonoBehaviour
     {
         takenOrder = false;
         npcMovement = gameObject.GetComponent<NPCMovement>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (inRange)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                if (takenOrder) //if we have already displayed order on queue
-                {
-                    Debug.Log("Step 1");
-                    DrinkData playerDrink = collidedPlayer.GetComponent<DrinkData>();
-                    if (DrinkController.compareData(playerDrink, order)) //if Player delivers correct order
-                    {
-                        Debug.Log("Correct order");
-                        Debug.Log("CLEARING");
-                        //updates order status to complete and player no longer has drink
-                        orderComplete = true;
-                        DrinkController.clearData(playerDrink);
-                        rController.removeSprite(recipeSprite);
-                        npcManager.clear(tableNum);
-                    }
-                    else
-                    {
-                        //display the angry animation
-                        Debug.Log("Incorrect order");
-                    }
-                }
-                else //if we have not displayed order on queue
-                {
-                    //display order/recipe to the queue
-                    RecipeData order = rController.createRecipe();
-                    gameObject.GetComponent<NPCInteraction>().setOrder(order.recipeList);
-                    //recipeSprite = order.recipeSprite;
-                    takenOrder = true;
-                }
-            }
-        }
+        collidedPlayer = null;
+        hudController = GameObject.Find("HUD").GetComponent<HUDController>();
     }
 
     public void setTableNum(int tnum)
@@ -70,26 +34,83 @@ public class NPCInteraction : MonoBehaviour
         tableNum = tnum;
     }
 
-    public void setOrder(List<int> newOrder)
+    public void setOrder(Recipe newOrder)
     {
         order = newOrder;
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public void PlayerInRange()
     {
-        Debug.Log("Entered");
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            Debug.Log("hi player");
+        if (npcMovement.sitting) {
             inRange = true;
-            collidedPlayer = collision.gameObject;
+
+            GameObject newToolTip = Instantiate(toolTipPrefab, transform.position + new Vector3(0.5f, 1f, 0f), Quaternion.identity);
+
+            for (int i = 0; i < tooltipConstant.tooltips.Length; i++)
+            {
+                if (tooltipConstant.tooltips[i].player == collidedPlayer.GetComponent<DrinkData>().currentPlayer)
+                {
+                    newToolTip.GetComponent<SpriteRenderer>().sprite = tooltipConstant.tooltips[i].npcTooltip;
+                    break;
+                }
+            }
+
+            newToolTip.transform.parent = transform;
+            newToolTip.name = "ToolTip";
         }
     }
-    void OnTriggerExit2D(Collider2D collision)
+
+    public void PlayerNotInRange()
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
+        if (npcMovement.sitting) {
             inRange = false;
+            collidedPlayer = null;
+            if (transform.Find("ToolTip") != null) {
+                Destroy(transform.Find("ToolTip").gameObject);
+            }
+        }
+    }
+
+    public void TakeOrder()
+    {
+        if (inRange && collidedPlayer != null) {
+            Animator alertAnimator = transform.Find("Alert").GetComponent<Animator>();
+
+            if (takenOrder) //if we have already displayed order on queue
+            {
+                Debug.Log("Order was taken, checking if delivery is correct");
+                DrinkData playerDrink = collidedPlayer.GetComponent<DrinkData>();
+                if (DrinkController.compareData(playerDrink, order.recipeList)) //if Player delivers correct order
+                {
+                    alertAnimator.SetBool("isWaiting", false);
+                    Debug.Log("Correct order, clearing!");
+                    //updates order status to complete and player no longer has drink
+                    orderComplete = true;
+                    DrinkController.clearData(playerDrink);
+
+                    rController.removeSprite(rController.showingDefault ? order.recipeSprite : order.recipeSpriteBack);
+                    hudController.RemoveAllIngredients(playerDrink.currentPlayer);
+                    
+                    npcManager.clear(tableNum);
+                }
+                else
+                {
+                    alertAnimator.SetTrigger("isRejected");
+                    // TODO: Display the angry animation
+                    Debug.Log("Incorrect order");
+                }
+            }
+            else //if we have not displayed order on queue
+            {
+                Debug.Log("Giving order to player");
+                //display order/recipe to the queue
+                Recipe order = rController.createRecipe();
+                setOrder(order);
+                takenOrder = true;
+                
+                // Display waiting VFX
+                alertAnimator.SetBool("isWaiting", true);
+            }
         }
     }
 }

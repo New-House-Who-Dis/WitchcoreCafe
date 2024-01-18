@@ -8,6 +8,9 @@ public class CupDispenserController : MonoBehaviour
     public bool isActive;
     public Animator anim;
     public DrinkData drink;
+    public int ingredientID;
+    public WorkstationScriptableObject workstations;
+    public Vector3 toolTipOffset;
 
     // Start is called before the first frame update
     void Start()

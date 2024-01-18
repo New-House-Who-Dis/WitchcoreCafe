@@ -65,7 +65,6 @@ public class GameStateSystem : MonoBehaviour
     IEnumerator SetupGame()
     {
         regenerate = false;
-        Debug.Log("meow");
         npcManager.BeginGeneration();
         yield return new WaitForSeconds(1f);
     }
